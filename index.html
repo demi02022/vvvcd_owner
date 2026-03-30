@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>학생회 관리자 페이지</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="admin-page">
+    <header class="site-header">
+      <div class="site-header-inner site-header-simple">
+        <div class="brand-block">
+          <p class="brand-year">Visual Design Student Council 2026</p>
+          <strong>학생회 관리자 페이지</strong>
+        </div>
+        <div class="header-tools admin-header-tools">
+          <a class="inline-link" href="index.html">페이지 바로가기</a>
+          <div class="admin-session-chip" id="admin-session-panel" hidden>
+            <span id="admin-session-email">-</span>
+            <button class="inline-link" type="button" id="admin-signout">로그아웃</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-shell">
+      <section class="intro-board admin-intro-board">
+        <p class="panel-kicker">Admin</p>
+        <h1>행사와 학생회 일정을 관리합니다.</h1>
+        <p class="panel-description">저장하면 메인 사이트의 행사 배너와 학생회 일정에 바로 반영됩니다.</p>
+      </section>
+
+      <section class="admin-grid" id="admin-editor-grid">
+        <article class="intro-board admin-board">
+          <div class="admin-board-header admin-board-header-stacked">
+            <div>
+              <p class="panel-kicker">Promo Banner</p>
+              <h2>행사 배너 관리</h2>
+            </div>
+            <div class="admin-board-actions admin-board-actions-promo">
+              <button class="inline-link" type="button" id="add-promo-slide">배너 추가</button>
+              <div class="admin-carousel-controls">
+                <button class="inline-link admin-carousel-button" type="button" id="promo-prev" aria-label="이전 배너">&larr;</button>
+                <span class="admin-carousel-meta" id="promo-position">1 / 1</span>
+                <button class="inline-link admin-carousel-button" type="button" id="promo-next" aria-label="다음 배너">&rarr;</button>
+              </div>
+            </div>
+          </div>
+          <div class="admin-list admin-list-promo" id="promo-slide-list"></div>
+        </article>
+
+        <article class="intro-board admin-board">
+          <div class="admin-board-header">
+            <div>
+              <p class="panel-kicker">Student Events</p>
+              <h2>학생회 행사 일정 관리</h2>
+            </div>
+            <button class="inline-link" type="button" id="add-student-event">일정 추가</button>
+          </div>
+          <div class="admin-list" id="student-event-list"></div>
+        </article>
+      </section>
+
+      <section class="intro-board admin-action-board" id="admin-action-board">
+        <div class="admin-toolbar">
+          <div class="admin-status-wrap">
+            <strong>저장 상태</strong>
+            <p id="admin-status" class="admin-status-text">데이터를 불러오는 중입니다.</p>
+          </div>
+          <div class="admin-actions">
+            <button class="inline-link admin-danger" type="button" id="reset-admin-data">기본값으로 되돌리기</button>
+            <button class="post-submit" type="button" id="save-admin-data">저장하기</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="admin-login-modal active" id="admin-login-modal" aria-hidden="false">
+      <div class="admin-login-backdrop"></div>
+      <section class="admin-login-card" aria-label="관리자 로그인">
+        <p class="panel-kicker">Supabase Auth</p>
+        <h2>학생회 로그인</h2>
+        <p class="panel-description" id="admin-auth-status"></p>
+        <form id="admin-login-form" class="admin-auth-form">
+          <label class="admin-field admin-field-wide">
+            <span>이메일</span>
+            <input type="email" id="admin-email" placeholder="admin@example.com" autocomplete="email" required />
+          </label>
+          <label class="admin-field admin-field-wide">
+            <span>비밀번호</span>
+            <input type="password" id="admin-password" placeholder="비밀번호" autocomplete="current-password" required />
+          </label>
+          <button class="post-submit" type="submit">로그인</button>
+        </form>
+      </section>
+    </div>
+
+    <div class="admin-editor-modal" id="promo-editor-modal" aria-hidden="true" hidden>
+      <div class="admin-editor-backdrop" data-editor-close></div>
+      <section class="admin-editor-card" aria-label="배너 상세 조정">
+        <div class="admin-editor-header">
+          <div>
+            <p class="panel-kicker">Detail Editor</p>
+            <h2>배너 상세 조정</h2>
+          </div>
+          <button class="inline-link" type="button" data-editor-close>닫기</button>
+        </div>
+        <div class="admin-editor-layout">
+          <div class="admin-editor-preview-wrap">
+            <div class="admin-editor-preview" id="promo-editor-preview">
+              <div class="admin-editor-preview-image" id="promo-editor-preview-image"></div>
+              <div class="admin-editor-preview-overlay" id="promo-editor-preview-overlay"></div>
+              <div class="admin-editor-preview-copy" id="promo-editor-preview-copy">
+                <p class="admin-editor-preview-title" id="promo-editor-preview-title"></p>
+                <p class="admin-editor-preview-meta" id="promo-editor-preview-meta"></p>
+              </div>
+            </div>
+            <p class="admin-editor-help">이미지 확대와 위치, 텍스트 위치를 조정해서 실제 메인 배너처럼 미리 확인할 수 있습니다.</p>
+          </div>
+          <div class="admin-editor-controls">
+            <label class="admin-field admin-field-wide">
+              <span>제목</span>
+              <input type="text" id="editor-title" />
+            </label>
+            <label class="admin-field admin-field-wide">
+              <span>기간/설명</span>
+              <input type="text" id="editor-meta" />
+            </label>
+            <div class="admin-range-grid">
+              <label class="admin-field admin-range-field">
+                <span>이미지 확대</span>
+                <div class="admin-custom-range" data-range-wrapper>
+                  <div class="admin-custom-range-track"></div>
+                  <div class="admin-custom-range-fill"></div>
+                  <div class="admin-custom-range-thumb"></div>
+                  <input type="range" id="editor-image-scale" min="1" max="2.4" step="0.01" />
+                </div>
+              </label>
+              <label class="admin-field admin-range-field">
+                <span>이미지 가로 위치</span>
+                <div class="admin-custom-range" data-range-wrapper>
+                  <div class="admin-custom-range-track"></div>
+                  <div class="admin-custom-range-fill"></div>
+                  <div class="admin-custom-range-thumb"></div>
+                  <input type="range" id="editor-image-x" min="0" max="100" step="1" />
+                </div>
+              </label>
+              <label class="admin-field admin-range-field">
+                <span>이미지 세로 위치</span>
+                <div class="admin-custom-range" data-range-wrapper>
+                  <div class="admin-custom-range-track"></div>
+                  <div class="admin-custom-range-fill"></div>
+                  <div class="admin-custom-range-thumb"></div>
+                  <input type="range" id="editor-image-y" min="0" max="100" step="1" />
+                </div>
+              </label>
+              <label class="admin-field admin-range-field">
+                <span>텍스트 가로 위치</span>
+                <div class="admin-custom-range" data-range-wrapper>
+                  <div class="admin-custom-range-track"></div>
+                  <div class="admin-custom-range-fill"></div>
+                  <div class="admin-custom-range-thumb"></div>
+                  <input type="range" id="editor-text-x" min="0" max="70" step="1" />
+                </div>
+              </label>
+              <label class="admin-field admin-range-field">
+                <span>텍스트 세로 위치</span>
+                <div class="admin-custom-range" data-range-wrapper>
+                  <div class="admin-custom-range-track"></div>
+                  <div class="admin-custom-range-fill"></div>
+                  <div class="admin-custom-range-thumb"></div>
+                  <input type="range" id="editor-text-y" min="0" max="70" step="1" />
+                </div>
+              </label>
+              <label class="admin-field admin-range-field">
+                <span>텍스트 너비</span>
+                <div class="admin-custom-range" data-range-wrapper>
+                  <div class="admin-custom-range-track"></div>
+                  <div class="admin-custom-range-fill"></div>
+                  <div class="admin-custom-range-thumb"></div>
+                  <input type="range" id="editor-text-width" min="26" max="88" step="1" />
+                </div>
+              </label>
+              <label class="admin-field admin-range-field">
+                <span>그라데이션 강도</span>
+                <div class="admin-custom-range" data-range-wrapper>
+                  <div class="admin-custom-range-track"></div>
+                  <div class="admin-custom-range-fill"></div>
+                  <div class="admin-custom-range-thumb"></div>
+                  <input type="range" id="editor-overlay" min="0.15" max="1" step="0.01" />
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="admin-editor-actions">
+          <button class="inline-link" type="button" id="editor-reset">기본값</button>
+          <button class="post-submit" type="button" id="editor-save">적용하기</button>
+        </div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>
